@@ -19,8 +19,7 @@ class DryModelGenerator < DryGenerator
               :references
               
   def initialize(runtime_args, runtime_options = {})
-    @options = DEFAULT_OPTIONS.merge(options)
-    super(runtime_args, runtime_options.merge(@options))
+    super(runtime_args, runtime_options)
     
     @attributes ||= []
     args_for_model = []
@@ -46,6 +45,7 @@ class DryModelGenerator < DryGenerator
     
     @args = args_for_model
     @references = attributes.select(&:reference?)
+    @options = DEFAULT_OPTIONS.merge(options)
   end
   
   def manifest

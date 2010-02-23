@@ -6,10 +6,10 @@ class <%= controller_class_name %>ControllerTest < ActionController::TestCase
   context 'create' do
     setup do
       <%= resource_instance %> = <%= build_object %>
-      post :create, :<%= singular_name %> => <%= resource_instance %>.attributes
+      post :create, :<%= model_singular_name %> => <%= resource_instance %>.attributes
       <%= resource_instance %> = <%= class_name %>.find(:all).last
     end
-    should_redirect_to("the <%= resource_instance %>'s show page") { <%= show_path %> }
+    should_redirect_to("<%= model_singular_name %>'s show path") { @controller.instance_eval{<%= show_path %>} }
   end
   
 <% end -%>
@@ -17,9 +17,9 @@ class <%= controller_class_name %>ControllerTest < ActionController::TestCase
   context 'update' do
     setup do
       <%= resource_instance %> = <%= build_object %>
-      put :update, :id => <%= resource_instance %>.to_param, :<%= singular_name %> => <%= resource_instance %>.attributes
+      put :update, :id => <%= resource_instance %>.to_param, :<%= model_singular_name %> => <%= resource_instance %>.attributes
     end
-    should_redirect_to("the <%= resource_instance %>'s show page") { <%= show_path %> }
+    should_redirect_to("<%= model_singular_name %>'s show path") { @controller.instance_eval{<%= show_path %>} }
   end
   
 <% end -%>
@@ -29,7 +29,7 @@ class <%= controller_class_name %>ControllerTest < ActionController::TestCase
       <%= resource_instance %> = <%= build_object %>
       delete :destroy, :id => <%= resource_instance %>.to_param
     end
-    should_redirect_to("the <%= resource_instance %>'s index page") { <%= index_path %> }
+    should_redirect_to("<%= model_singular_name %>'s index path") { @controller.instance_eval{<%= index_path %>} }
   end
   
 <% end -%>
@@ -40,7 +40,7 @@ class <%= controller_class_name %>ControllerTest < ActionController::TestCase
     end
     should_respond_with :success
     should_render_template :new
-    should_assign_to :<%= singular_name %>
+    should_assign_to :<%= model_singular_name %>
   end
   
 <% end -%>
@@ -52,7 +52,7 @@ class <%= controller_class_name %>ControllerTest < ActionController::TestCase
     end
     should_respond_with :success
     should_render_template :edit
-    should_assign_to :<%= singular_name %>
+    should_assign_to :<%= model_singular_name %>
   end
   
 <% end -%>
@@ -64,7 +64,7 @@ class <%= controller_class_name %>ControllerTest < ActionController::TestCase
     end
     should_respond_with :success
     should_render_template :show
-    should_assign_to :<%= singular_name %>
+    should_assign_to :<%= model_singular_name %>
   end
   
 <% end -%>
@@ -74,7 +74,7 @@ class <%= controller_class_name %>ControllerTest < ActionController::TestCase
       get :index
     end
     should_respond_with :success
-    should_assign_to :<%= plural_name %>
+    should_assign_to :<%= model_plural_name %>
   end
   
 <% end -%>

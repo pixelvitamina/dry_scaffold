@@ -1,10 +1,10 @@
-- content_tag_for(:tr, <%= singular_name -%>, :class => cycle(:odd, :even)) do
+- content_tag_for(:tr, <%= model_singular_name -%>, :class => cycle(:odd, :even)) do
 <% attributes.each do |attribute| -%>
-  %td.<%= attribute.name %>= h <%= singular_name %>.try(:<%= attribute.name %>)
+  %td.<%= attribute.name %>= h <%= model_singular_name %>.try(:<%= attribute.name %>)
 <% end -%>
   %td.actions
-    = link_to 'Show', <%= show_path(singular_name) %>
+    = link_to 'Show', <%= show_path(model_singular_name) %>
     |
-    = link_to 'Edit', <%= edit_path(singular_name) %>
+    = link_to 'Edit', <%= edit_path(model_singular_name) %>
     |
-    = link_to 'Destroy', <%= destroy_path(singular_name) %>, :confirm => 'Are you sure?', :method => :delete
+    = link_to 'Destroy', <%= destroy_path(model_singular_name) %>, :confirm => 'Are you sure?', :method => :delete

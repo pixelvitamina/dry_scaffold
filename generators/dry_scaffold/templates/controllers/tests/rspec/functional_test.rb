@@ -41,7 +41,7 @@ describe <%= controller_class_name %>Controller do
   it "create action should redirect when model is valid" do
     <%= class_name %>.any_instance.stubs(:valid?).returns(true)
     post :create
-    response.should redirect_to(<%= singular_name %>_url(assigns[:<%= singular_name %>]))
+    response.should redirect_to(<%= model_singular_name %>_url(assigns[:<%= model_singular_name %>]))
   end
 
 <% end %>
@@ -62,16 +62,16 @@ describe <%= controller_class_name %>Controller do
   it "update action should redirect when model is valid" do
     <%= class_name %>.any_instance.stubs(:valid?).returns(true)
     put :update, :id => <%= class_name %>.first
-    response.should redirect_to(<%= singular_name %>_url(assigns[:<%= singular_name %>]))
+    response.should redirect_to(<%= model_singular_name %>_url(assigns[:<%= model_singular_name %>]))
   end
   
 <% end %>
 <% if actions.include?(:destroy) -%>
   it "destroy action should destroy model and redirect to index action" do
-    <%= singular_name %> = <%= class_name %>.first
-    delete :destroy, :id => <%= singular_name %>
-    response.should redirect_to(<%= plural_name %>_url)
-    <%= class_name %>.exists?(<%= singular_name %>.id).should be_false
+    <%= model_singular_name %> = <%= class_name %>.first
+    delete :destroy, :id => <%= model_singular_name %>
+    response.should redirect_to(<%= model_plural_name %>_url)
+    <%= class_name %>.exists?(<%= model_singular_name %>.id).should be_false
   end
   
 <% end %>

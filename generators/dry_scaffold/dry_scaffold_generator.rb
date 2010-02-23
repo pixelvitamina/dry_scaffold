@@ -78,8 +78,7 @@ class DryScaffoldGenerator < DryGenerator
   alias_method  :controller_table_name, :controller_plural_name
   
   def initialize(runtime_args, runtime_options = {})
-    @options = DEFAULT_OPTIONS.merge(options)
-    super(runtime_args, runtime_options.merge(@options))
+    super(runtime_args, runtime_options)
     
     @controller_name = @name.pluralize
     base_name, @controller_class_path, @controller_file_path, @controller_class_nesting, @controller_class_nesting_depth = extract_modules(@controller_name)
@@ -126,6 +125,7 @@ class DryScaffoldGenerator < DryGenerator
     
     @actions ||= DEFAULT_ARGS[:actions] || DEFAULT_CONTROLLER_ACTIONS
     @formats ||= DEFAULT_ARGS[:formats] || DEFAULT_RESPOND_TO_FORMATS
+    @options = DEFAULT_OPTIONS.merge(options)
   end
   
   def manifest
@@ -141,7 +141,7 @@ class DryScaffoldGenerator < DryGenerator
         File.join(CONTROLLERS_PATH, controller_class_path, "#{controller_file_name}_controller.rb")
         
       # Controller Tests.
-      unless options[:skip_tests] || options[:skip_controller_tests]
+      unless options[:skip_tests]
         controller_tests_path = File.join(TEST_PATHS[test_framework], FUNCTIONAL_TESTS_PATH[test_framework])
         m.directory File.join(controller_tests_path, controller_class_path)
         m.template File.join('controllers', 'tests', "#{test_framework}", 'functional_test.rb'),
@@ -213,7 +213,7 @@ class DryScaffoldGenerator < DryGenerator
   def build_object
     case options[:factory_framework]
       when :factory_girl then
-        "Factory(:#{singular_name})"
+        "Factory(:#{model_singular_name})"
       when :machinist then
         "#{class_name}.make"
       when :object_daddy then
@@ -226,11 +226,19 @@ class DryScaffoldGenerator < DryGenerator
   ### Link Helpers.
   
   def collection_instance
-    "@#{collection_name}"
+    "@#{model_plural_name}"
   end
   
   def resource_instance
-    "@#{singular_name}"
+    "@#{model_singular_name}"
+  end
+  
+  def collection_path
+    "#{collection_name}_path"
+  end
+  
+  def resource_path
+    "#{singular_name}_path"
   end
   
   def index_path
@@ -250,7 +258,7 @@ class DryScaffoldGenerator < DryGenerator
   end
   
   def destroy_path(object_name = resource_instance)
-    "#{object_name}"
+    "#{show_path(object_name)}"
   end
   
   def index_url
@@ -270,7 +278,7 @@ class DryScaffoldGenerator < DryGenerator
   end
   
   def destroy_url(object_name = resource_instance)
-    "#{object_name}"
+    "#{show_url(object_name)}"
   end
   
   ### Feed Helpers.
@@ -322,9 +330,14 @@ class DryScaffoldGenerator < DryGenerator
       super(name)
       @model_singular_name = @singular_name
       @model_plural_name = @plural_name
+      
+      #quickfix because default options are not set correctly at the moment
+      options[:resourceful] ||= true
+      
       @collection_name = options[:resourceful] ? RESOURCEFUL_COLLECTION_NAME : @model_plural_name
       @singular_name = options[:resourceful] ? RESOURCEFUL_SINGULAR_NAME : @model_singular_name
       @plural_name = options[:resourceful] ? RESOURCEFUL_SINGULAR_NAME.pluralize : @model_plural_name
+      
     end
     
     def add_options!(opt)
@@ -350,10 +363,6 @@ class DryScaffoldGenerator < DryGenerator
         options[:formtastic] = !v
       end
       
-      opt.on("--skip-controller-tests", "Controller: Skip generation of tests for controller.") do |v|
-        options[:skip_controller_tests] = v
-      end
-
       opt.on('--skip-views', "View: Skip generation of views.") do |v|
         options[:skip_views] = v
       end
@@ -385,10 +394,6 @@ class DryScaffoldGenerator < DryGenerator
       
       opt.on("--skip-tests", "Model: Skip generation of tests.") do |v|
         options[:skip_tests] = v
-      end
-      
-      opt.on("--skip-controller tests", "Controller: Skip generation of tests for controller.") do |v|
-        options[:skip_controller_tests] = v
       end
       
       opt.separator ' '

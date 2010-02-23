@@ -1,4 +1,3 @@
-
 class DryGenerator < Rails::Generator::NamedBase
   
   HAS_WILL_PAGINATE =         defined?(WillPaginate)
@@ -41,7 +40,6 @@ class DryGenerator < Rails::Generator::NamedBase
       :formtastic       => CONFIG_OPTIONS['formtastic']   || HAS_FORMTASTIC,
       :pagination       => CONFIG_OPTIONS['pagination']   || HAS_WILL_PAGINATE,
       :skip_tests       => !CONFIG_OPTIONS['tests']       || false,
-      :skip_controller_tests => !CONFIG_OPTIONS['controller_tests']       || false,
       :skip_helpers     => !CONFIG_OPTIONS['helpers']     || false,
       :skip_views       => !CONFIG_OPTIONS['views']       || false,
       :layout           => CONFIG_OPTIONS['layout']       || false,
@@ -66,21 +64,20 @@ class DryGenerator < Rails::Generator::NamedBase
       :rspec            => 'spec'
     }.freeze
 
-  DEFAULT_TEST_FRAMEWORK =    :test_unit
-  DEFAULT_FACTORY_FRAMEWORK = :fixtures
+  DEFAULT_TEST_FRAMEWORK =      :test_unit
+  DEFAULT_FACTORY_FRAMEWORK =   :fixtures
   
-  TESTS_PATH = File.join('test').freeze
-  FUNCTIONAL_TESTS_PATH = {
-      :test_unit  => 'functional',
-      :shoulda    => 'functional',
-      :rspec      => 'controllers'
-    }
-  UNIT_TESTS_PATH =       {
-      :test_unit  => 'unit',
-      :shoulda    => 'unit',
-      :rspec      => 'models',
-    }
-  CUSTOM_TEMPLATES_PATH = Rails.root.join(*%w[lib scaffold_templates])
+  TESTS_PATH =                  File.join('test').freeze
+  FUNCTIONAL_TESTS_PATH =       {
+    :test_unit  => 'functional',
+    :shoulda    => 'functional',
+    :rspec      => 'controllers'
+  }
+  UNIT_TESTS_PATH =  {
+    :test_unit  => 'unit',
+    :shoulda    => 'unit',
+    :rspec      => 'models',
+  }
   
   NON_ATTR_ARG_KEY_PREFIX =     '_'.freeze
   
@@ -90,23 +87,13 @@ class DryGenerator < Rails::Generator::NamedBase
   
   def initialize(runtime_args, runtime_options = {})
     super(runtime_args, runtime_options)
-    set_test_framework
-  end
-  
-  def source_path(relative_source)
-    custom_relative_source = File.join('lib', 'scaffold_templates', relative_source)
-    custom_source = Rails.root.join(custom_relative_source)
-    puts "      custom  @#{custom_relative_source}" if File.exist?(custom_relative_source)
-    File.exist?(custom_source) ? custom_source : super(relative_source)
+    
+    @test_framework = ( options[:test_framework] && options[:test_framework].to_sym ) || 
+                      [:rspec,:test_unit,:shoulda].detect{|t|options[t]} || 
+                      DEFAULT_TEST_FRAMEWORK
   end
   
   protected
-    
-    def set_test_framework
-      @test_framework = (options[:test_framework] && options[:test_framework].to_sym) || 
-                        [:rspec, :test_unit, :shoulda].detect{ |t| options[t] } || 
-                        DEFAULT_TEST_FRAMEWORK
-    end
     
     def symbol_array_to_expression(array)
       ":#{array.compact.join(', :')}" if array.present?
